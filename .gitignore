@@ -1,0 +1,5 @@
+# ignore node_modules
+node_modules
+
+# ignore my_deployment_package.zip for lambda function
+my_deployment_package.zip
