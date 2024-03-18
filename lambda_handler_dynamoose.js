@@ -1,12 +1,17 @@
 // import dynamoose from 'dynamoose';
 const dynamoose = require('dynamoose');
+const crypto = require('crypto');
 
 // Assuming AWS credentials are set through environment variables or IAM role
-dynamoose.aws.sdk.config.update({
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
-    region: process.env.REGION
+const ddb = new dynamoose.aws.ddb.DynamoDB({
+    "credentials": {
+        "accessKeyId": process.env.ACCESS_KEY_ID,
+        "secretAccessKey": process.env.SECRET_ACCESS_KEY,
+    },
+    "region": process.env.REGION
 });
+
+dynamoose.aws.ddb.set(ddb);
 
 // Define a schema that matches your DynamoDB table structure
 const testSchema = new dynamoose.Schema({
@@ -31,10 +36,10 @@ const lambdaHandler = async (event, context) => {
     try {
         if (event.queryMethod === 'createItem') {
             // Create a new item in the table
-            await TestModel.create({ id: '1', body: 'test' });
+            await TestModel.create({ id: crypto.randomUUID(), body: 'This is a test item' });
             return {
                 statusCode: 200,
-                body: JSON.stringify({ message: 'Item created' }),
+                body: JSON.stringify({ message: 'Item created'}),
                 headers: {
                     'Content-Type': 'application/json',
                 }
